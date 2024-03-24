@@ -8,7 +8,10 @@
     "name": "paypal-cli",
     "description": "A command line interface that interacts with the PayPal REST API",
     "version": "1.0.0",
-    "main": "src/index.ts",
+    "main": "./dist/ppl.js",
+    "bin": {
+        "ppl": "./dist/ppl.js"
+    },
     "scripts": {
         "build": "npx tsc",
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,7 +20,6 @@
     "license": "ISC",
     "dependencies": {
         "chalk": "^4.1.0",
-        "commander": "^12.0.0",
-        "figlet": "^1.7.0"
+        "commander": "^12.0.0"
     }
 }
