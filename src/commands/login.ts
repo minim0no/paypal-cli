@@ -15,7 +15,7 @@ login.addHelpText(
         1. Log into the developer dashboard @ https://developer.paypal.com/dashboard/
         2. Select Apps & Credentials.
         3. New accounts come with a Default Application in the REST API apps section. To create a new project, select Create App.
-        4. Copy the client ID and client secret for your app.
+        4. Copy the Client ID and Client Secret for your app.
 
     `
 );
