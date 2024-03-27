@@ -1,10 +1,22 @@
 import { Command } from "commander";
+import {
+    auth,
+    setAccessToken,
+    setClientId,
+    setClientSecret,
+} from "../utils/auth";
 
 const login = new Command("login")
     .description("Login to the REST API to begin using the PayPal CLI")
     .argument("<string>", "Client ID")
     .argument("<string>", "Client Secret")
-    .action((clientId, clientSecret) => {});
+    .action(async (clientId, clientSecret) => {
+        const accessToken = await auth(clientId, clientSecret);
+        await setClientId(clientId);
+        await setClientSecret(clientSecret);
+        await setAccessToken(accessToken);
+        console.log("Successfully logged in.");
+    });
 
 // --help
 login.addHelpText(
