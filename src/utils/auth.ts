@@ -1,9 +1,13 @@
 import { setPassword, getPassword } from "keytar";
-import { openSync } from "fs";
-import { spawn } from "child_process";
-import { writeFile } from "fs/promises";
-import path from "path";
+import { readFileSync } from "fs";
+import { createRefreshTokenProcess, isRunning } from "./childProcess";
 
+/**
+ *
+ * @param clientId - The Client ID for the PayPal App
+ * @param clientSecret - The Client Secret for the PayPal App
+ * @returns The access token retrieved
+ */
 export async function auth(clientId: string, clientSecret: string) {
     const authorization =
         "Basic " +
@@ -23,25 +27,21 @@ export async function auth(clientId: string, clientSecret: string) {
         }
     ).catch((error) => console.error("Error:", error));
 
-    const filePath = path.join(__dirname, "delay.txt");
     const data = await (response as Response).json();
     if (data && data.expires_in) {
-        const out = openSync("./out.log", "a");
-        const err = openSync("./out.log", "a");
-        writeFile(filePath, data.expires_in.toString()).then(() => {
-            const child = spawn("node", ["refreshToken.js"], {
-                cwd: __dirname,
-                stdio: ["ignore", out, err], // ['input', 'output', 'error']
-                detached: true,
-            });
-
-            child.unref();
-        });
+        const cur_pid = Number(readFileSync("cur-pid.txt", "utf-8"));
+        if (!isRunning(cur_pid)) {
+            createRefreshTokenProcess(data.expires_in);
+        }
     }
 
     return data.access_token;
 }
 
+/**
+ * Sets the Client ID in the user's Credential Manager
+ * @param clientId - The Client ID for the PayPal App
+ */
 export async function setClientId(clientId: string) {
     try {
         await setPassword("PayPal", "ClientId", clientId);
@@ -51,6 +51,10 @@ export async function setClientId(clientId: string) {
     }
 }
 
+/**
+ * Sets the Client Secret in the user's Credential Manager
+ * @param clientSecret - The Client Secret for the PayPal App
+ */
 export async function setClientSecret(clientSecret: string) {
     try {
         await setPassword("PayPal", "ClientSecret", clientSecret);
@@ -60,6 +64,10 @@ export async function setClientSecret(clientSecret: string) {
     }
 }
 
+/**
+ * Sets the Access Token in the user's Credential Manager
+ * @param accessToken - The Access Token for the PayPal App
+ */
 export async function setAccessToken(accessToken: string) {
     try {
         await setPassword("PayPal", "AccessToken", accessToken);
@@ -69,6 +77,10 @@ export async function setAccessToken(accessToken: string) {
     }
 }
 
+/**
+ * Retrieves the Client ID from the user's Credential Manager
+ * @returns The Client ID for the PayPal App
+ */
 export async function getClientId() {
     try {
         const clientId = await getPassword("PayPal", "ClientId");
@@ -83,6 +95,10 @@ export async function getClientId() {
     }
 }
 
+/**
+ * Retrieves the Client Secret from the user's Credential Manager
+ * @returns The Client Secret for the PayPal App
+ */
 export async function getClientSecret() {
     try {
         const clientSecret = await getPassword("PayPal", "ClientSecret");
@@ -97,6 +113,10 @@ export async function getClientSecret() {
     }
 }
 
+/**
+ * Retrieves the Access Token from the user's Credential Manager
+ * @returns The Access Token for the PayPal App
+ */
 export async function getAccessToken() {
     try {
         const accessToken = await getPassword("PayPal", "AccessToken");

@@ -1,6 +1,10 @@
 import { getClientId, getClientSecret, setAccessToken, auth } from "./auth";
 import { readFileSync } from "fs";
 
+/**
+ * Refreshes the access token.
+ * @returns null if credentials not found, "success" otherwise.
+ */
 export async function refreshToken() {
     const clientId = await getClientId();
     const clientSecret = await getClientSecret();
@@ -13,6 +17,10 @@ export async function refreshToken() {
     }
 }
 
+/**
+ * Refreshes the access token after a delay.
+ * @param delay - The delay
+ */
 export async function refreshTokenAfterDelay(delay: number) {
     console.log(delay);
     setTimeout(async () => {
