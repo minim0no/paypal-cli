@@ -11,6 +11,8 @@ const help = new Command("help").action(() => {
         "\nThese are common Ppl commands used to interact with PayPal: \n"
     );
 
+    console.log("To get started, please login");
+    console.log("\tlogin\tlogs into PayPal");
     console.log("get help:");
     console.log("\thelp\tdisplays a list of common commands and usage.");
 });

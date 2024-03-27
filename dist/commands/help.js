@@ -9,9 +9,11 @@ const help = new commander_1.Command("help").action(() => {
     console.log("\n");
     (0, paypal_ascii_1.default)(); // DISPLAY PAYPAL ASCII
     console.log("\nusage: ppl [-V | --version] [-h | --help] <command>\n");
-    console.log("\nThese are common ppl commands used to interact with the PayPal: \n");
-    console.log("get some help:");
-    console.log("\thelp\tget some help lol");
+    console.log("\nThese are common Ppl commands used to interact with PayPal: \n");
+    console.log("To get started, please login");
+    console.log("\tlogin\tlogs into PayPal");
+    console.log("get help:");
+    console.log("\thelp\tdisplays a list of common commands and usage.");
 });
 module.exports = help;
 //# sourceMappingURL=help.js.map

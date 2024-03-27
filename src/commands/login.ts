@@ -28,6 +28,7 @@ login.addHelpText(
         2. Select Apps & Credentials.
         3. New accounts come with a Default Application in the REST API apps section. To create a new project, select Create App.
         4. Copy the Client ID and Client Secret for your app.
-
     `
 );
+
+module.exports = login;
