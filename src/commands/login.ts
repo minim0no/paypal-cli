@@ -1,5 +1,6 @@
 import { Command } from "commander";
-import { refreshToken, setClientId, setClientSecret } from "../utils/auth";
+import { setClientId, setClientSecret } from "../utils/auth";
+import { refreshToken } from "../utils/refreshToken";
 
 const login = new Command("login")
     .description(

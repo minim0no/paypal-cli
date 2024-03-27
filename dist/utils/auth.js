@@ -8,9 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAccessToken = exports.getClientSecret = exports.getClientId = exports.setAccessToken = exports.setClientSecret = exports.setClientId = exports.auth = void 0;
 const keytar_1 = require("keytar");
+const fs_1 = require("fs");
+const child_process_1 = require("child_process");
+const promises_1 = require("fs/promises");
+const path_1 = __importDefault(require("path"));
 function auth(clientId, clientSecret) {
     return __awaiter(this, void 0, void 0, function* () {
         const authorization = "Basic " +
@@ -25,7 +32,20 @@ function auth(clientId, clientSecret) {
             },
             body: "grant_type=client_credentials",
         }).catch((error) => console.error("Error:", error));
+        const filePath = path_1.default.join(__dirname, "delay.txt");
         const data = yield response.json();
+        if (data && data.expires_in) {
+            const out = (0, fs_1.openSync)("./out.log", "a");
+            const err = (0, fs_1.openSync)("./out.log", "a");
+            (0, promises_1.writeFile)(filePath, data.expires_in.toString()).then(() => {
+                const child = (0, child_process_1.spawn)("node", ["refreshToken.js"], {
+                    cwd: __dirname,
+                    stdio: ["ignore", out, err], // ['input', 'output', 'error']
+                    detached: true,
+                });
+                child.unref();
+            });
+        }
         return data.access_token;
     });
 }

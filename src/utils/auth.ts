@@ -1,4 +1,8 @@
 import { setPassword, getPassword } from "keytar";
+import { openSync } from "fs";
+import { spawn } from "child_process";
+import { writeFile } from "fs/promises";
+import path from "path";
 
 export async function auth(clientId: string, clientSecret: string) {
     const authorization =
@@ -19,9 +23,21 @@ export async function auth(clientId: string, clientSecret: string) {
         }
     ).catch((error) => console.error("Error:", error));
 
+    const filePath = path.join(__dirname, "delay.txt");
     const data = await (response as Response).json();
+    if (data && data.expires_in) {
+        const out = openSync("./out.log", "a");
+        const err = openSync("./out.log", "a");
+        writeFile(filePath, data.expires_in.toString()).then(() => {
+            const child = spawn("node", ["refreshToken.js"], {
+                cwd: __dirname,
+                stdio: ["ignore", out, err], // ['input', 'output', 'error']
+                detached: true,
+            });
 
-    refreshTokenAfterDelay(data.expires_in);
+            child.unref();
+        });
+    }
 
     return data.access_token;
 }
@@ -93,20 +109,4 @@ export async function getAccessToken() {
     } catch (error) {
         console.error("Error fetching Access Token: ", error);
     }
-}
-
-export async function refreshToken() {
-    const clientId = await getClientId();
-    const clientSecret = await getClientSecret();
-    if (clientId && clientSecret) {
-        setAccessToken(await auth(clientId, clientSecret));
-        return "success";
-    } else {
-        console.log("Error: credentials not found or unavailable");
-        return null;
-    }
-}
-
-async function refreshTokenAfterDelay(delay: number) {
-    setTimeout(refreshToken, delay * 1000); // s to ms
 }
