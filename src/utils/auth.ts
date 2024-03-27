@@ -1,6 +1,7 @@
 import { setPassword, getPassword } from "keytar";
-import { readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { createRefreshTokenProcess, isRunning } from "./childProcess";
+import path from "path";
 
 /**
  *
@@ -29,8 +30,13 @@ export async function auth(clientId: string, clientSecret: string) {
 
     const data = await (response as Response).json();
     if (data && data.expires_in) {
-        const cur_pid = Number(readFileSync("cur-pid.txt", "utf-8"));
-        if (!isRunning(cur_pid)) {
+        const pidFilePath = path.join(__dirname, "cur-pid.txt");
+        if (existsSync(pidFilePath)) {
+            const cur_pid = Number(readFileSync(pidFilePath, "utf-8"));
+            if (!isRunning(cur_pid)) {
+                createRefreshTokenProcess(data.expires_in);
+            }
+        } else {
             createRefreshTokenProcess(data.expires_in);
         }
     }

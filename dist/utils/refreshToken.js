@@ -12,6 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.refreshTokenAfterDelay = exports.refreshToken = void 0;
 const auth_1 = require("./auth");
 const fs_1 = require("fs");
+/**
+ * Refreshes the access token.
+ * @returns null if credentials not found, "success" otherwise.
+ */
 function refreshToken() {
     return __awaiter(this, void 0, void 0, function* () {
         const clientId = yield (0, auth_1.getClientId)();
@@ -27,6 +31,10 @@ function refreshToken() {
     });
 }
 exports.refreshToken = refreshToken;
+/**
+ * Refreshes the access token after a delay.
+ * @param delay - The delay
+ */
 function refreshTokenAfterDelay(delay) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log(delay);
@@ -37,16 +45,16 @@ function refreshTokenAfterDelay(delay) {
 }
 exports.refreshTokenAfterDelay = refreshTokenAfterDelay;
 if (require.main == module) {
-    console.log("entered");
-    console.log((0, fs_1.readFileSync)("delay.txt", "utf-8"));
+    console.log("Refresh Token Process intiated");
     const delay = Number((0, fs_1.readFileSync)("delay.txt", "utf-8"));
     if (isNaN(delay)) {
         console.error("Invalid delay argument");
         process.exit(1);
     }
     setTimeout(() => {
-        console.log("exit");
-    }, 1000);
+        console.log("finished");
+        process.exit(0);
+    }, 10000);
     refreshTokenAfterDelay(delay);
 }
 //# sourceMappingURL=refreshToken.js.map

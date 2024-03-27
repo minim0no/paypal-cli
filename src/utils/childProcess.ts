@@ -2,6 +2,7 @@ import path from "path";
 import { openSync, write } from "fs";
 import { writeFile } from "fs/promises";
 import { spawn } from "child_process";
+import { refreshToken } from "./refreshToken";
 /**
  * Checks if a child process is currently running.
  *
@@ -13,10 +14,12 @@ export function isRunning(pid: number): boolean {
         process.kill(pid, 0);
         return true;
     } catch (error) {
+        // EPERM -> process is running
         if ((error as NodeJS.ErrnoException).code === "EPERM") {
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 }
 
@@ -25,17 +28,21 @@ export function isRunning(pid: number): boolean {
  * @param delay - The time until the access token expires
  */
 export function createRefreshTokenProcess(delay: number) {
-    const filePath = path.join(__dirname, "delay.txt");
+    const delayFilePath = path.join(__dirname, "delay.txt");
     const out = openSync("./out.log", "a");
     const err = openSync("./out.log", "a");
-    writeFile(filePath, delay.toString()).then(() => {
+    writeFile(delayFilePath, delay.toString()).then(() => {
         const child = spawn("node", ["refreshToken.js"], {
             cwd: __dirname,
             stdio: ["ignore", out, err], // ['input', 'output', 'error']
             detached: true,
         });
 
-        writeFile("cur-pid.txt", child.pid ? child.pid.toString() : "");
+        const pidFilePath = path.join(__dirname, "cur-pid.txt");
+        writeFile(pidFilePath, child.pid ? child.pid.toString() : "");
+        child.on("exit", () => {
+            refreshToken();
+        });
 
         child.unref();
     });
