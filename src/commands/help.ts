@@ -3,18 +3,20 @@ import ASCII from "../utils/paypal_ascii";
 
 const help = new Command("help").action(() => {
     console.log("\n");
-    ASCII(); // DISPLAY PAYPAL ASCII
-
+    console.log(ASCII());
     console.log("\nusage: ppl [-V | --version] [-h | --help] <command>\n");
 
     console.log(
-        "\nThese are common Ppl commands used to interact with PayPal: \n"
+        "\nThese are common Ppl commands used to interact with PayPal: "
     );
 
-    console.log("To get started, please login");
-    console.log("\tlogin\tlogs into PayPal");
-    console.log("get help:");
-    console.log("\thelp\tdisplays a list of common commands and usage.");
+    console.log("\n");
+    console.log("To get started login:");
+    console.log("\tlogin\tlog into PayPal");
+
+    console.log("\n");
+    console.log("For any help, execute:");
+    console.log("\thelp\tdisplay a list of common commands and usage.");
 });
 
 module.exports = help;

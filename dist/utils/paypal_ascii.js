@@ -7,12 +7,14 @@ const chalk_1 = __importDefault(require("chalk"));
 const pay = chalk_1.default.hex("#012169");
 const pal = chalk_1.default.hex("#009cde");
 function ASCII() {
-    console.log(pay(",------.                  ") + pal(",------.         ,--.") + "     ,-----.,--.   ,--.");
-    console.log(pay("|  .--. ' ,--,--.,--. ,--.") + pal("|  .--. ' ,--,--.|  |") + "    '  .--./|  |   |  |");
-    console.log(pay("|  '--' |' ,-.  | \\  '  / ") + pal("|  '--' |' ,-.  ||  |") + "    |  |    |  |   |  |");
-    console.log(pay("|  | --' \\ '-'  |  \\   '  ") + pal("|  | --' \\ '-'  ||  |") + "    '  '--'\\|  '--.|  |");
-    console.log(pay("`--'      `--`--'.-'  /   ") + pal("`--'      `--`--'`--'") + "     `-----'`-----'`--'");
-    console.log(pay("                 `---'                                                 "));
+    let asciiArt = "";
+    asciiArt += pay(",------.                  ") + pal(",------.         ,--.") + "     ,-----.,--.   ,--.\n";
+    asciiArt += pay("|  .--. ' ,--,--.,--. ,--.") + pal("|  .--. ' ,--,--.|  |") + "    '  .--./|  |   |  |\n";
+    asciiArt += pay("|  '--' |' ,-.  | \\  '  / ") + pal("|  '--' |' ,-.  ||  |") + "    |  |    |  |   |  |\n";
+    asciiArt += pay("|  | --' \\ '-'  |  \\   '  ") + pal("|  | --' \\ '-'  ||  |") + "    '  '--'\\|  '--.|  |\n";
+    asciiArt += pay("`--'      `--`--'.-'  /   ") + pal("`--'      `--`--'`--'") + "     `-----'`-----'`--'\n";
+    asciiArt += pay("                 `---'                                                 ");
+    return asciiArt;
 }
 exports.default = ASCII;
 //# sourceMappingURL=paypal_ascii.js.map

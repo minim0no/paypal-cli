@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const auth_1 = require("../utils/auth");
 const login = new commander_1.Command("login")
-    .description("Login to the REST API to begin using the PayPal CLI")
+    .description("Login to PayPal to begin using the PayPal CLI, --help for more info")
     .argument("<string>", "Client ID")
     .argument("<string>", "Client Secret")
     .action((clientId, clientSecret) => __awaiter(void 0, void 0, void 0, function* () {
