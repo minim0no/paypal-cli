@@ -1,23 +1,23 @@
 import { Command } from "commander";
-import {
-    auth,
-    setAccessToken,
-    setClientId,
-    setClientSecret,
-} from "../utils/auth";
+import { refreshToken, setClientId, setClientSecret } from "../utils/auth";
 
 const login = new Command("login")
     .description(
         "Login to PayPal to begin using the PayPal CLI, --help for more info"
     )
-    .argument("<string>", "Client ID")
-    .argument("<string>", "Client Secret")
+    .argument("[string]", "Client ID")
+    .argument("[string]", "Client Secret")
     .action(async (clientId, clientSecret) => {
-        const accessToken = await auth(clientId, clientSecret);
-        await setClientId(clientId);
-        await setClientSecret(clientSecret);
-        await setAccessToken(accessToken);
-        console.log("Successfully logged in.");
+        if (clientId && clientSecret) {
+            await setClientId(clientId);
+            await setClientSecret(clientSecret);
+        }
+        const opt = refreshToken();
+        if (!opt) {
+            console.log("Error: Missing Client ID or Client Secret argument.");
+        } else {
+            console.log("Successfully logged in.");
+        }
     });
 
 // --help

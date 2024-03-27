@@ -21,6 +21,8 @@ export async function auth(clientId: string, clientSecret: string) {
 
     const data = await (response as Response).json();
 
+    refreshTokenAfterDelay(data.expires_in);
+
     return data.access_token;
 }
 
@@ -91,4 +93,20 @@ export async function getAccessToken() {
     } catch (error) {
         console.error("Error fetching Access Token: ", error);
     }
+}
+
+export async function refreshToken() {
+    const clientId = await getClientId();
+    const clientSecret = await getClientSecret();
+    if (clientId && clientSecret) {
+        setAccessToken(await auth(clientId, clientSecret));
+        return "success";
+    } else {
+        console.log("Error: credentials not found or unavailable");
+        return null;
+    }
+}
+
+async function refreshTokenAfterDelay(delay: number) {
+    setTimeout(refreshToken, delay * 1000); // s to ms
 }
