@@ -34,4 +34,8 @@ login.addHelpText(
     `
 );
 
+login.showHelpAfterError(
+    "Make sure you are passing credentials, use ppl login --help for more info!"
+);
+
 module.exports = login;
