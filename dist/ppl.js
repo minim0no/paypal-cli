@@ -9,6 +9,7 @@ const paypal_ascii_1 = __importDefault(require("./utils/paypal_ascii"));
 const program = new commander_1.Command();
 const helpCommand = require("./commands/help");
 const loginCommand = require("./commands/login");
+const payoutCommand = require("./commands/payout");
 program
     .name("ppl")
     .version("0.0.1")
@@ -16,5 +17,6 @@ program
 program.addHelpText("before", `\n ${(0, paypal_ascii_1.default)()}`);
 program.addCommand(helpCommand);
 program.addCommand(loginCommand);
+program.addCommand(payoutCommand);
 program.parse(process.argv);
 //# sourceMappingURL=ppl.js.map

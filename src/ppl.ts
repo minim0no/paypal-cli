@@ -7,6 +7,7 @@ const program = new Command();
 
 const helpCommand = require("./commands/help");
 const loginCommand = require("./commands/login");
+const payoutCommand = require("./commands/payout");
 
 program
     .name("ppl")
@@ -17,5 +18,6 @@ program.addHelpText("before", `\n ${ASCII()}`);
 
 program.addCommand(helpCommand);
 program.addCommand(loginCommand);
+program.addCommand(payoutCommand);
 
 program.parse(process.argv);

@@ -1,4 +1,18 @@
 import { Argument, Command, Option } from "commander";
+import { createInterface } from "readline";
+
+const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+});
+
+const validateEmail = (email: string) => {
+    return email
+        .toLowerCase()
+        .match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        );
+};
 
 const paypalCurrencies = [
     "AUD", // Australian dollar
@@ -31,7 +45,7 @@ const paypalCurrencies = [
 
 const receiver_arg = new Argument("<email>", "Email of the receiver");
 
-const amount_arg = new Argument("<number>", "Amount to send");
+const amount_arg = new Argument("<amount>", "Amount to send");
 
 const currency_option = new Option(
     "-c, --currency [currency]",
@@ -64,6 +78,31 @@ const payout = new Command("payout")
     .addOption(currency_option)
     .addOption(note_option)
     .addOption(subject_option)
-    .addOption(message_option);
+    .addOption(message_option)
+    .action((receiver, amount, options) => {
+        if (!validateEmail(receiver)) {
+            console.error("Error: receiver's email is not valid!");
+            process.exit(1);
+        }
+        rl.question(
+            `Are you sure you want to send ${amount} to ${receiver}? (y/n)\n`,
+            (confirmation) => {
+                switch (confirmation.toLowerCase()) {
+                    case "yes":
+                    case "y":
+                        console.log("Processing payment...");
+                        break;
+                    case "no":
+                    case "n":
+                        console.log("Payment cancelled.");
+                        process.exit(0);
+                    default:
+                        console.log("Invalid input.");
+                        process.exit(1);
+                }
+                rl.close();
+            }
+        );
+    });
 
 module.exports = payout;

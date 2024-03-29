@@ -2,9 +2,9 @@ import { Argument, Command } from "commander";
 import { setClientId, setClientSecret } from "../utils/auth";
 import { refreshToken } from "../utils/refreshToken";
 
-const clientId_arg = new Argument("[string]", "Client ID");
+const clientId_arg = new Argument("[clientId]", "Client ID");
 
-const clientSecret_arg = new Argument("[string]", "Client Secret");
+const clientSecret_arg = new Argument("[clientSecret]", "Client Secret");
 
 const login = new Command("login")
     .description(

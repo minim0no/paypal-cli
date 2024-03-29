@@ -12,10 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const auth_1 = require("../utils/auth");
 const refreshToken_1 = require("../utils/refreshToken");
+const clientId_arg = new commander_1.Argument("[clientId]", "Client ID");
+const clientSecret_arg = new commander_1.Argument("[clientSecret]", "Client Secret");
 const login = new commander_1.Command("login")
-    .description("Login to PayPal to begin using the PayPal CLI, --help for more info")
-    .argument("[string]", "Client ID")
-    .argument("[string]", "Client Secret")
+    .description("Login to PayPal to begin using the PayPal CLI, do ppl login --help for more info.")
+    .addArgument(clientId_arg)
+    .addArgument(clientSecret_arg)
     .action((clientId, clientSecret) => __awaiter(void 0, void 0, void 0, function* () {
     if (clientId && clientSecret) {
         yield (0, auth_1.setClientId)(clientId);
@@ -38,6 +40,6 @@ login.addHelpText("after", `
         3. New accounts come with a Default Application in the REST API apps section. To create a new project, select Create App.
         4. Copy the Client ID and Client Secret for your app.
     `);
-login.showHelpAfterError("Make sure you are passing credentials, use ppl login --help for more info!");
+login.showHelpAfterError("Make sure you are passing credentials if you're accessing a new REST API app, do ppl login --help for more info.");
 module.exports = login;
 //# sourceMappingURL=login.js.map
