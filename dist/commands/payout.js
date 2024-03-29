@@ -2,10 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const readline_1 = require("readline");
-const rl = (0, readline_1.createInterface)({
-    input: process.stdin,
-    output: process.stdout,
-});
+const payout_1 = require("../utils/api/payout");
 const validateEmail = (email) => {
     return email
         .toLowerCase()
@@ -39,40 +36,62 @@ const paypalCurrencies = [
     "THB", // Thai baht
     "USD", // United States dollar
 ];
-const receiver_arg = new commander_1.Argument("<email>", "Email of the receiver");
-const amount_arg = new commander_1.Argument("<amount>", "Amount to send");
+const receiver_option = new commander_1.Option("-r, --receivers <emails>", "Comma-separated list of receiver emails");
+const amount_option = new commander_1.Option("-v, --values <values>", "Comma-separated list of amounts corresponding to each receiver");
 const currency_option = new commander_1.Option("-c, --currency [currency]", "Specify the currency type")
     .default("USD")
     .choices(paypalCurrencies);
-const note_option = new commander_1.Option("-n, --note [note]", "Send a note to the receiver").default("Thanks for your patronage!");
-const subject_option = new commander_1.Option("-s, --subject [subject]", "The email subject").default("You have a payout!");
-const message_option = new commander_1.Option("-m, --message [message]", "The email message").default("You have received a payout! Thanks for using our service!");
+const note_option = new commander_1.Option("-n, --notes [string]", "Optional comma-separated list of notes corresponding to each receiver or one global note").default("Thanks for your patronage!");
+const subject_option = new commander_1.Option("-s, --subject [string]", "Optional email subject").default("You have a payout!");
+const message_option = new commander_1.Option("-m, --message [string]", "Optional email message").default("You have received a payout! Thanks for using our service!");
 const payout = new commander_1.Command("payout")
     .description("Make payments to multiple PayPal or Venmo recipients, do ppl payout --help for more info.")
-    .addArgument(receiver_arg)
-    .addArgument(amount_arg)
+    .addOption(receiver_option)
+    .addOption(amount_option)
     .addOption(currency_option)
     .addOption(note_option)
     .addOption(subject_option)
     .addOption(message_option)
-    .action((receiver, amount, options) => {
-    if (!validateEmail(receiver)) {
-        console.error("Error: receiver's email is not valid!");
-        process.exit(1);
+    .action((options) => {
+    const receivers = options.receivers.split(",");
+    const values = options.values.split(",");
+    const notes = options.notes.split(",");
+    const currency_type = options.currency;
+    const email_subject = options.subject;
+    const email_message = options.message;
+    // email validation
+    for (const receiver of receivers) {
+        if (!validateEmail(receiver)) {
+            console.error(`Error: The email ${receiver} is not valid!`);
+            process.exit(1);
+        }
     }
-    rl.question(`Are you sure you want to send ${amount} ${options.currency} to ${receiver}? (y/n)\n`, (confirmation) => {
+    const valuesSum = (values) => {
+        let sum = 0;
+        for (const value of values) {
+            sum += Number(value);
+        }
+        return sum;
+    };
+    const rl = (0, readline_1.createInterface)({
+        input: process.stdin,
+        output: process.stdout,
+    });
+    // confirmation
+    rl.question(`Are you sure you want to send a total of ${valuesSum(values)} ${options.currency} to ${receivers.length} receivers? (y/n)\n`, (confirmation) => {
         switch (confirmation.toLowerCase()) {
             case "yes":
             case "y":
                 console.log("Processing payment...");
+                (0, payout_1.sendPayout)(receivers, values, notes, currency_type, email_subject, email_message);
                 break;
             case "no":
             case "n":
                 console.log("Payment cancelled.");
-                process.exit(0);
+                break;
             default:
                 console.log("Invalid input.");
-                process.exit(1);
+                break;
         }
         rl.close();
     });

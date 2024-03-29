@@ -2,11 +2,6 @@ import { Command, Option } from "commander";
 import { createInterface } from "readline";
 import { sendPayout } from "../utils/api/payout";
 
-const rl = createInterface({
-    input: process.stdin,
-    output: process.stdout,
-});
-
 const validateEmail = (email: string) => {
     return email
         .toLowerCase()
@@ -62,17 +57,17 @@ const currency_option = new Option(
     .choices(paypalCurrencies);
 
 const note_option = new Option(
-    "-n, --notes [notes]",
+    "-n, --notes [string]",
     "Optional comma-separated list of notes corresponding to each receiver or one global note"
 ).default("Thanks for your patronage!");
 
 const subject_option = new Option(
-    "-s, --subject [subject]",
+    "-s, --subject [string]",
     "Optional email subject"
 ).default("You have a payout!");
 
 const message_option = new Option(
-    "-m, --message [message]",
+    "-m, --message [string]",
     "Optional email message"
 ).default("You have received a payout! Thanks for using our service!");
 
@@ -87,9 +82,9 @@ const payout = new Command("payout")
     .addOption(subject_option)
     .addOption(message_option)
     .action((options) => {
-        const receivers = options.emails.split(",");
+        const receivers = options.receivers.split(",");
         const values = options.values.split(",");
-        const notes = options.values.split(",");
+        const notes = options.notes.split(",");
         const currency_type = options.currency;
         const email_subject = options.subject;
         const email_message = options.message;
@@ -110,6 +105,10 @@ const payout = new Command("payout")
             return sum;
         };
 
+        const rl = createInterface({
+            input: process.stdin,
+            output: process.stdout,
+        });
         // confirmation
         rl.question(
             `Are you sure you want to send a total of ${valuesSum(values)} ${
@@ -132,10 +131,10 @@ const payout = new Command("payout")
                     case "no":
                     case "n":
                         console.log("Payment cancelled.");
-                        process.exit(0);
+                        break;
                     default:
                         console.log("Invalid input.");
-                        process.exit(1);
+                        break;
                 }
                 rl.close();
             }
