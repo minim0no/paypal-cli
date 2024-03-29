@@ -60,7 +60,7 @@ const payout = new commander_1.Command("payout")
         console.error("Error: receiver's email is not valid!");
         process.exit(1);
     }
-    rl.question(`Are you sure you want to send ${amount} to ${receiver}? (y/n)\n`, (confirmation) => {
+    rl.question(`Are you sure you want to send ${amount} ${options.currency} to ${receiver}? (y/n)\n`, (confirmation) => {
         switch (confirmation.toLowerCase()) {
             case "yes":
             case "y":

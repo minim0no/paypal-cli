@@ -1,5 +1,6 @@
-import { Argument, Command, Option } from "commander";
+import { Command, Option } from "commander";
 import { createInterface } from "readline";
+import { sendPayout } from "../utils/api/payout";
 
 const rl = createInterface({
     input: process.stdin,
@@ -43,9 +44,15 @@ const paypalCurrencies = [
     "USD", // United States dollar
 ];
 
-const receiver_arg = new Argument("<email>", "Email of the receiver");
+const receiver_option = new Option(
+    "-r, --receivers <emails>",
+    "Comma-separated list of receiver emails"
+);
 
-const amount_arg = new Argument("<amount>", "Amount to send");
+const amount_option = new Option(
+    "-v, --values <values>",
+    "Comma-separated list of amounts corresponding to each receiver"
+);
 
 const currency_option = new Option(
     "-c, --currency [currency]",
@@ -55,42 +62,72 @@ const currency_option = new Option(
     .choices(paypalCurrencies);
 
 const note_option = new Option(
-    "-n, --note [note]",
-    "Send a note to the receiver"
+    "-n, --notes [notes]",
+    "Optional comma-separated list of notes corresponding to each receiver or one global note"
 ).default("Thanks for your patronage!");
 
 const subject_option = new Option(
     "-s, --subject [subject]",
-    "The email subject"
+    "Optional email subject"
 ).default("You have a payout!");
 
 const message_option = new Option(
     "-m, --message [message]",
-    "The email message"
+    "Optional email message"
 ).default("You have received a payout! Thanks for using our service!");
 
 const payout = new Command("payout")
     .description(
         "Make payments to multiple PayPal or Venmo recipients, do ppl payout --help for more info."
     )
-    .addArgument(receiver_arg)
-    .addArgument(amount_arg)
+    .addOption(receiver_option)
+    .addOption(amount_option)
     .addOption(currency_option)
     .addOption(note_option)
     .addOption(subject_option)
     .addOption(message_option)
-    .action((receiver, amount, options) => {
-        if (!validateEmail(receiver)) {
-            console.error("Error: receiver's email is not valid!");
-            process.exit(1);
+    .action((options) => {
+        const receivers = options.emails.split(",");
+        const values = options.values.split(",");
+        const notes = options.values.split(",");
+        const currency_type = options.currency;
+        const email_subject = options.subject;
+        const email_message = options.message;
+
+        // email validation
+        for (const receiver of receivers) {
+            if (!validateEmail(receiver)) {
+                console.error(`Error: The email ${receiver} is not valid!`);
+                process.exit(1);
+            }
         }
+
+        const valuesSum = (values: String[]) => {
+            let sum = 0;
+            for (const value of values) {
+                sum += Number(value);
+            }
+            return sum;
+        };
+
+        // confirmation
         rl.question(
-            `Are you sure you want to send ${amount} to ${receiver}? (y/n)\n`,
+            `Are you sure you want to send a total of ${valuesSum(values)} ${
+                options.currency
+            } to ${receivers.length} receivers? (y/n)\n`,
             (confirmation) => {
                 switch (confirmation.toLowerCase()) {
                     case "yes":
                     case "y":
                         console.log("Processing payment...");
+                        sendPayout(
+                            receivers,
+                            values,
+                            notes,
+                            currency_type,
+                            email_subject,
+                            email_message
+                        );
                         break;
                     case "no":
                     case "n":
