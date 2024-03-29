@@ -62,7 +62,6 @@ function setClientId(clientId) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield (0, keytar_1.setPassword)("PayPal", "ClientId", clientId);
-            console.log("Client ID saved successfully.");
         }
         catch (error) {
             console.error("Error saving Client ID: ", error);
@@ -78,7 +77,6 @@ function setClientSecret(clientSecret) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield (0, keytar_1.setPassword)("PayPal", "ClientSecret", clientSecret);
-            console.log("Client Secret saved successfully.");
         }
         catch (error) {
             console.error("Error saving Client Secret: ", error);
@@ -94,7 +92,6 @@ function setAccessToken(accessToken) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield (0, keytar_1.setPassword)("PayPal", "AccessToken", accessToken);
-            console.log("Access Token saved successfully.");
         }
         catch (error) {
             console.error("Error saving Access Token: ", error);
@@ -111,7 +108,6 @@ function getClientId() {
         try {
             const clientId = yield (0, keytar_1.getPassword)("PayPal", "ClientId");
             if (clientId) {
-                console.log("Client ID retrieved successfully.");
                 return clientId;
             }
             else {
@@ -133,7 +129,6 @@ function getClientSecret() {
         try {
             const clientSecret = yield (0, keytar_1.getPassword)("PayPal", "ClientSecret");
             if (clientSecret) {
-                console.log("Client Secret retrieved successfully.");
                 return clientSecret;
             }
             else {
@@ -155,7 +150,6 @@ function getAccessToken() {
         try {
             const accessToken = yield (0, keytar_1.getPassword)("PayPal", "AccessToken");
             if (accessToken) {
-                console.log("Access Token retrieved successfully.");
                 return accessToken;
             }
             else {

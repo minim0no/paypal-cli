@@ -51,7 +51,6 @@ export async function auth(clientId: string, clientSecret: string) {
 export async function setClientId(clientId: string) {
     try {
         await setPassword("PayPal", "ClientId", clientId);
-        console.log("Client ID saved successfully.");
     } catch (error) {
         console.error("Error saving Client ID: ", error);
     }
@@ -64,7 +63,6 @@ export async function setClientId(clientId: string) {
 export async function setClientSecret(clientSecret: string) {
     try {
         await setPassword("PayPal", "ClientSecret", clientSecret);
-        console.log("Client Secret saved successfully.");
     } catch (error) {
         console.error("Error saving Client Secret: ", error);
     }
@@ -77,7 +75,6 @@ export async function setClientSecret(clientSecret: string) {
 export async function setAccessToken(accessToken: string) {
     try {
         await setPassword("PayPal", "AccessToken", accessToken);
-        console.log("Access Token saved successfully.");
     } catch (error) {
         console.error("Error saving Access Token: ", error);
     }
@@ -91,7 +88,6 @@ export async function getClientId() {
     try {
         const clientId = await getPassword("PayPal", "ClientId");
         if (clientId) {
-            console.log("Client ID retrieved successfully.");
             return clientId;
         } else {
             return null;
@@ -109,7 +105,6 @@ export async function getClientSecret() {
     try {
         const clientSecret = await getPassword("PayPal", "ClientSecret");
         if (clientSecret) {
-            console.log("Client Secret retrieved successfully.");
             return clientSecret;
         } else {
             return null;
@@ -127,7 +122,6 @@ export async function getAccessToken() {
     try {
         const accessToken = await getPassword("PayPal", "AccessToken");
         if (accessToken) {
-            console.log("Access Token retrieved successfully.");
             return accessToken;
         } else {
             return null;

@@ -1,13 +1,17 @@
-import { Command } from "commander";
+import { Argument, Command } from "commander";
 import { setClientId, setClientSecret } from "../utils/auth";
 import { refreshToken } from "../utils/refreshToken";
 
+const clientId_arg = new Argument("[string]", "Client ID");
+
+const clientSecret_arg = new Argument("[string]", "Client Secret");
+
 const login = new Command("login")
     .description(
-        "Login to PayPal to begin using the PayPal CLI, --help for more info"
+        "Login to PayPal to begin using the PayPal CLI, do ppl login --help for more info."
     )
-    .argument("[string]", "Client ID")
-    .argument("[string]", "Client Secret")
+    .addArgument(clientId_arg)
+    .addArgument(clientSecret_arg)
     .action(async (clientId, clientSecret) => {
         if (clientId && clientSecret) {
             await setClientId(clientId);
@@ -35,7 +39,7 @@ login.addHelpText(
 );
 
 login.showHelpAfterError(
-    "Make sure you are passing credentials, use ppl login --help for more info!"
+    "Make sure you are passing credentials if you're accessing a new REST API app, do ppl login --help for more info."
 );
 
 module.exports = login;

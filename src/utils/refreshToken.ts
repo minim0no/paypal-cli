@@ -35,9 +35,5 @@ if (require.main == module) {
         console.error("Invalid delay argument");
         process.exit(1);
     }
-    setTimeout(() => {
-        console.log("finished");
-        process.exit(0);
-    }, 10000);
     refreshTokenAfterDelay(delay);
 }

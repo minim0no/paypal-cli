@@ -38,5 +38,6 @@ login.addHelpText("after", `
         3. New accounts come with a Default Application in the REST API apps section. To create a new project, select Create App.
         4. Copy the Client ID and Client Secret for your app.
     `);
+login.showHelpAfterError("Make sure you are passing credentials, use ppl login --help for more info!");
 module.exports = login;
 //# sourceMappingURL=login.js.map
