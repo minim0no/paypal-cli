@@ -40,7 +40,7 @@ const paypalCurrencies = [
 ];
 
 const receiver_option = new Option(
-    "-r, --receivers <emails>",
+    "-r, --recipients <emails>",
     "Comma-separated list of receiver emails"
 );
 
@@ -82,17 +82,23 @@ const payout = new Command("payout")
     .addOption(subject_option)
     .addOption(message_option)
     .action((options) => {
-        const receivers = options.receivers.split(",");
+        const recipients = options.recipients.split(",");
         const values = options.values.split(",");
         const notes = options.notes.split(",");
         const currency_type = options.currency;
         const email_subject = options.subject;
         const email_message = options.message;
 
+        if (notes.length === 1) {
+            for (let i = 1; i < recipients.length; i++) {
+                notes.push(notes[0]);
+            }
+        }
+
         // email validation
-        for (const receiver of receivers) {
-            if (!validateEmail(receiver)) {
-                console.error(`Error: The email ${receiver} is not valid!`);
+        for (const recipient of recipients) {
+            if (!validateEmail(recipient)) {
+                console.error(`Error: The email ${recipient} is not valid!`);
                 process.exit(1);
             }
         }
@@ -113,14 +119,14 @@ const payout = new Command("payout")
         rl.question(
             `Are you sure you want to send a total of ${valuesSum(values)} ${
                 options.currency
-            } to ${receivers.length} receivers? (y/n)\n`,
+            } to ${recipients.length} receivers? (y/n)\n`,
             (confirmation) => {
                 switch (confirmation.toLowerCase()) {
                     case "yes":
                     case "y":
                         console.log("Processing payment...");
                         sendPayout(
-                            receivers,
+                            recipients,
                             values,
                             notes,
                             currency_type,

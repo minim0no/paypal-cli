@@ -36,7 +36,7 @@ const paypalCurrencies = [
     "THB", // Thai baht
     "USD", // United States dollar
 ];
-const receiver_option = new commander_1.Option("-r, --receivers <emails>", "Comma-separated list of receiver emails");
+const receiver_option = new commander_1.Option("-r, --recipients <emails>", "Comma-separated list of receiver emails");
 const amount_option = new commander_1.Option("-v, --values <values>", "Comma-separated list of amounts corresponding to each receiver");
 const currency_option = new commander_1.Option("-c, --currency [currency]", "Specify the currency type")
     .default("USD")
@@ -53,16 +53,21 @@ const payout = new commander_1.Command("payout")
     .addOption(subject_option)
     .addOption(message_option)
     .action((options) => {
-    const receivers = options.receivers.split(",");
+    const recipients = options.recipients.split(",");
     const values = options.values.split(",");
     const notes = options.notes.split(",");
     const currency_type = options.currency;
     const email_subject = options.subject;
     const email_message = options.message;
+    if (notes.length === 1) {
+        for (let i = 1; i < recipients.length; i++) {
+            notes.push(notes[0]);
+        }
+    }
     // email validation
-    for (const receiver of receivers) {
-        if (!validateEmail(receiver)) {
-            console.error(`Error: The email ${receiver} is not valid!`);
+    for (const recipient of recipients) {
+        if (!validateEmail(recipient)) {
+            console.error(`Error: The email ${recipient} is not valid!`);
             process.exit(1);
         }
     }
@@ -78,12 +83,12 @@ const payout = new commander_1.Command("payout")
         output: process.stdout,
     });
     // confirmation
-    rl.question(`Are you sure you want to send a total of ${valuesSum(values)} ${options.currency} to ${receivers.length} receivers? (y/n)\n`, (confirmation) => {
+    rl.question(`Are you sure you want to send a total of ${valuesSum(values)} ${options.currency} to ${recipients.length} receivers? (y/n)\n`, (confirmation) => {
         switch (confirmation.toLowerCase()) {
             case "yes":
             case "y":
                 console.log("Processing payment...");
-                (0, payout_1.sendPayout)(receivers, values, notes, currency_type, email_subject, email_message);
+                (0, payout_1.sendPayout)(recipients, values, notes, currency_type, email_subject, email_message);
                 break;
             case "no":
             case "n":

@@ -38,6 +38,9 @@ function auth(clientId, clientSecret) {
             body: "grant_type=client_credentials",
         }).catch((error) => console.error("Error:", error));
         const data = yield response.json();
+        if (data.error) {
+            console.error("Error: ", data.error_description);
+        }
         if (data && data.expires_in) {
             const pidFilePath = path_1.default.join(__dirname, "cur-pid.txt");
             if ((0, fs_1.existsSync)(pidFilePath)) {

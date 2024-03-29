@@ -29,6 +29,10 @@ export async function auth(clientId: string, clientSecret: string) {
     ).catch((error) => console.error("Error:", error));
 
     const data = await (response as Response).json();
+    if (data.error) {
+        console.error("Error: ", data.error_description);
+    }
+
     if (data && data.expires_in) {
         const pidFilePath = path.join(__dirname, "cur-pid.txt");
         if (existsSync(pidFilePath)) {

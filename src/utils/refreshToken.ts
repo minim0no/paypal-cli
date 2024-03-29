@@ -9,7 +9,8 @@ export async function refreshToken() {
     const clientId = await getClientId();
     const clientSecret = await getClientSecret();
     if (clientId && clientSecret) {
-        setAccessToken(await auth(clientId, clientSecret));
+        const access_token = await auth(clientId, clientSecret);
+        setAccessToken(access_token);
         return "success";
     } else {
         console.error("Error: credentials not found or unavailable");

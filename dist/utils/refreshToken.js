@@ -21,7 +21,8 @@ function refreshToken() {
         const clientId = yield (0, auth_1.getClientId)();
         const clientSecret = yield (0, auth_1.getClientSecret)();
         if (clientId && clientSecret) {
-            (0, auth_1.setAccessToken)(yield (0, auth_1.auth)(clientId, clientSecret));
+            const access_token = yield (0, auth_1.auth)(clientId, clientSecret);
+            (0, auth_1.setAccessToken)(access_token);
             return "success";
         }
         else {
