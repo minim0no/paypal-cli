@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createRefreshTokenProcess = exports.isRunning = void 0;
+exports.killProcess = exports.createRefreshTokenProcess = exports.isRunning = void 0;
 const path_1 = __importDefault(require("path"));
 const fs_1 = require("fs");
 const promises_1 = require("fs/promises");
@@ -54,4 +54,15 @@ function createRefreshTokenProcess(delay) {
     });
 }
 exports.createRefreshTokenProcess = createRefreshTokenProcess;
+function killProcess(pid) {
+    try {
+        process.kill(pid);
+        return true;
+    }
+    catch (error) {
+        console.error("Error killing refresh token process: ", error);
+        return false;
+    }
+}
+exports.killProcess = killProcess;
 //# sourceMappingURL=childProcess.js.map

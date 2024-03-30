@@ -66,8 +66,8 @@ export async function sendPayout(
                 date.getFullYear();
 
             // Date - sender batch id - payout batch id
-            const historyLine = `${formattedDate}\t\t${sender_batch_id}\t\t${payout_batch_id}\n`;
-            const filePath = path.join(__dirname, "payout-history.txt");
+            const historyLine = `${formattedDate}\t${sender_batch_id}\t${payout_batch_id}\n`;
+            const filePath = path.join(__dirname, "../payout-history.txt");
             appendFile(filePath, historyLine, (err) => {
                 if (err) throw err;
                 console.log(

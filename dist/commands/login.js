@@ -8,12 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const auth_1 = require("../utils/auth");
 const refreshToken_1 = require("../utils/refreshToken");
-const clientId_arg = new commander_1.Argument("[clientId]", "Client ID");
-const clientSecret_arg = new commander_1.Argument("[clientSecret]", "Client Secret");
+const childProcess_1 = require("../utils/childProcess");
+const fs_1 = require("fs");
+const path_1 = __importDefault(require("path"));
+const clientId_arg = new commander_1.Argument("[string]", "Client ID");
+const clientSecret_arg = new commander_1.Argument("[string]", "Client Secret");
 const login = new commander_1.Command("login")
     .description("Login to PayPal to begin using the PayPal CLI, do ppl login --help for more info.")
     .addArgument(clientId_arg)
@@ -22,6 +28,11 @@ const login = new commander_1.Command("login")
     if (clientId && clientSecret) {
         yield (0, auth_1.setClientId)(clientId);
         yield (0, auth_1.setClientSecret)(clientSecret);
+        const filePath = path_1.default.join(__dirname, "../utils/cur-pid.txt");
+        if ((0, fs_1.existsSync)(filePath)) {
+            const pid = Number((0, fs_1.readFileSync)(filePath));
+            (0, childProcess_1.killProcess)(pid);
+        }
     }
     const opt = (0, refreshToken_1.refreshToken)();
     if (!opt) {

@@ -10,6 +10,7 @@ const program = new commander_1.Command();
 const helpCommand = require("./commands/help");
 const loginCommand = require("./commands/login");
 const payoutCommand = require("./commands/payout");
+const historyCommand = require("./commands/history");
 program
     .name("ppl")
     .version("0.0.1")
@@ -18,5 +19,6 @@ program.addHelpText("before", `\n ${(0, paypal_ascii_1.default)()}`);
 program.addCommand(helpCommand);
 program.addCommand(loginCommand);
 program.addCommand(payoutCommand);
+program.addCommand(historyCommand);
 program.parse(process.argv);
 //# sourceMappingURL=ppl.js.map

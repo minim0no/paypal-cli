@@ -36,8 +36,8 @@ const paypalCurrencies = [
     "THB", // Thai baht
     "USD", // United States dollar
 ];
-const receiver_option = new commander_1.Option("-r, --recipients <emails>", "Comma-separated list of receiver emails");
-const amount_option = new commander_1.Option("-v, --values <values>", "Comma-separated list of amounts corresponding to each receiver");
+const receiver_arg = new commander_1.Argument("[emails]", "Comma-separated list of receiver emails");
+const amount_arg = new commander_1.Argument("[values]", "Comma-separated list of amounts corresponding to each receiver");
 const currency_option = new commander_1.Option("-c, --currency [currency]", "Specify the currency type")
     .default("USD")
     .choices(paypalCurrencies);
@@ -46,26 +46,26 @@ const subject_option = new commander_1.Option("-s, --subject [string]", "Optiona
 const message_option = new commander_1.Option("-m, --message [string]", "Optional email message").default("You have received a payout! Thanks for using our service!");
 const payout = new commander_1.Command("payout")
     .description("Make payments to multiple PayPal or Venmo recipients, do ppl payout --help for more info.")
-    .addOption(receiver_option)
-    .addOption(amount_option)
+    .addArgument(receiver_arg)
+    .addArgument(amount_arg)
     .addOption(currency_option)
     .addOption(note_option)
     .addOption(subject_option)
     .addOption(message_option)
-    .action((options) => {
-    const recipients = options.recipients.split(",");
-    const values = options.values.split(",");
+    .action((recipients, values, options) => {
+    const recipient_list = recipients.split(",");
+    const value_list = values.split(",");
     const notes = options.notes.split(",");
     const currency_type = options.currency;
     const email_subject = options.subject;
     const email_message = options.message;
     if (notes.length === 1) {
-        for (let i = 1; i < recipients.length; i++) {
+        for (let i = 1; i < recipient_list.length; i++) {
             notes.push(notes[0]);
         }
     }
     // email validation
-    for (const recipient of recipients) {
+    for (const recipient of recipient_list) {
         if (!validateEmail(recipient)) {
             console.error(`Error: The email ${recipient} is not valid!`);
             process.exit(1);
@@ -83,12 +83,12 @@ const payout = new commander_1.Command("payout")
         output: process.stdout,
     });
     // confirmation
-    rl.question(`Are you sure you want to send a total of ${valuesSum(values)} ${options.currency} to ${recipients.length} receivers? (y/n)\n`, (confirmation) => {
+    rl.question(`Are you sure you want to send a total of ${valuesSum(values)} ${options.currency} to ${recipient_list.length} receivers? (y/n)\n`, (confirmation) => {
         switch (confirmation.toLowerCase()) {
             case "yes":
             case "y":
                 console.log("Processing payment...");
-                (0, payout_1.sendPayout)(recipients, values, notes, currency_type, email_subject, email_message);
+                (0, payout_1.sendPayout)(recipient_list, value_list, notes, currency_type, email_subject, email_message);
                 break;
             case "no":
             case "n":

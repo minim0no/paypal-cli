@@ -65,8 +65,8 @@ function sendPayout(recipients, values, notes, currency_type, email_subject, ema
                 "/" +
                 date.getFullYear();
             // Date - sender batch id - payout batch id
-            const historyLine = `${formattedDate}\t\t${sender_batch_id}\t\t${payout_batch_id}\n`;
-            const filePath = path_1.default.join(__dirname, "payout-history.txt");
+            const historyLine = `${formattedDate}\t${sender_batch_id}\t${payout_batch_id}\n`;
+            const filePath = path_1.default.join(__dirname, "../payout-history.txt");
             (0, fs_1.appendFile)(filePath, historyLine, (err) => {
                 if (err)
                     throw err;

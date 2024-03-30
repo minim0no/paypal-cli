@@ -1,4 +1,4 @@
-import { Command, Option } from "commander";
+import { Argument, Command, Option } from "commander";
 import { createInterface } from "readline";
 import { sendPayout } from "../utils/api/payout";
 
@@ -39,13 +39,13 @@ const paypalCurrencies = [
     "USD", // United States dollar
 ];
 
-const receiver_option = new Option(
-    "-r, --recipients <emails>",
+const receiver_arg = new Argument(
+    "[emails]",
     "Comma-separated list of receiver emails"
 );
 
-const amount_option = new Option(
-    "-v, --values <values>",
+const amount_arg = new Argument(
+    "[values]",
     "Comma-separated list of amounts corresponding to each receiver"
 );
 
@@ -75,28 +75,28 @@ const payout = new Command("payout")
     .description(
         "Make payments to multiple PayPal or Venmo recipients, do ppl payout --help for more info."
     )
-    .addOption(receiver_option)
-    .addOption(amount_option)
+    .addArgument(receiver_arg)
+    .addArgument(amount_arg)
     .addOption(currency_option)
     .addOption(note_option)
     .addOption(subject_option)
     .addOption(message_option)
-    .action((options) => {
-        const recipients = options.recipients.split(",");
-        const values = options.values.split(",");
+    .action((recipients, values, options) => {
+        const recipient_list = recipients.split(",");
+        const value_list = values.split(",");
         const notes = options.notes.split(",");
         const currency_type = options.currency;
         const email_subject = options.subject;
         const email_message = options.message;
 
         if (notes.length === 1) {
-            for (let i = 1; i < recipients.length; i++) {
+            for (let i = 1; i < recipient_list.length; i++) {
                 notes.push(notes[0]);
             }
         }
 
         // email validation
-        for (const recipient of recipients) {
+        for (const recipient of recipient_list) {
             if (!validateEmail(recipient)) {
                 console.error(`Error: The email ${recipient} is not valid!`);
                 process.exit(1);
@@ -119,15 +119,15 @@ const payout = new Command("payout")
         rl.question(
             `Are you sure you want to send a total of ${valuesSum(values)} ${
                 options.currency
-            } to ${recipients.length} receivers? (y/n)\n`,
+            } to ${recipient_list.length} receivers? (y/n)\n`,
             (confirmation) => {
                 switch (confirmation.toLowerCase()) {
                     case "yes":
                     case "y":
                         console.log("Processing payment...");
                         sendPayout(
-                            recipients,
-                            values,
+                            recipient_list,
+                            value_list,
                             notes,
                             currency_type,
                             email_subject,
