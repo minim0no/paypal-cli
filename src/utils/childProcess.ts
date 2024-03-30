@@ -1,5 +1,5 @@
 import path from "path";
-import { openSync, write } from "fs";
+import { openSync } from "fs";
 import { writeFile } from "fs/promises";
 import { spawn } from "child_process";
 import { refreshToken } from "./refreshToken";
@@ -46,4 +46,14 @@ export function createRefreshTokenProcess(delay: number) {
 
         child.unref();
     });
+}
+
+export function killProcess(pid: number) {
+    try {
+        process.kill(pid);
+        return true;
+    } catch (error) {
+        console.error("Error killing refresh token process: ", error);
+        return false;
+    }
 }

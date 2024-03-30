@@ -1,10 +1,13 @@
 import { Argument, Command } from "commander";
 import { setClientId, setClientSecret } from "../utils/auth";
 import { refreshToken } from "../utils/refreshToken";
+import { killProcess } from "../utils/childProcess";
+import { read, readFileSync } from "fs";
+import path from "path";
 
-const clientId_arg = new Argument("[clientId]", "Client ID");
+const clientId_arg = new Argument("[string]", "Client ID");
 
-const clientSecret_arg = new Argument("[clientSecret]", "Client Secret");
+const clientSecret_arg = new Argument("[string]", "Client Secret");
 
 const login = new Command("login")
     .description(
@@ -16,7 +19,11 @@ const login = new Command("login")
         if (clientId && clientSecret) {
             await setClientId(clientId);
             await setClientSecret(clientSecret);
+            const filePath = path.join(__dirname, "../utils/cur-pid.txt");
+            const pid = Number(readFileSync(filePath));
+            killProcess(pid);
         }
+
         const opt = refreshToken();
         if (!opt) {
             console.log("Error: Missing Client ID or Client Secret argument.");

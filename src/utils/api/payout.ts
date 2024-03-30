@@ -64,6 +64,7 @@ export async function sendPayout(
                 date.getDate() +
                 "/" +
                 date.getFullYear();
+
             // Date - sender batch id - payout batch id
             const historyLine = `${formattedDate}\t\t${sender_batch_id}\t\t${payout_batch_id}\n`;
             const filePath = path.join(__dirname, "payout-history.txt");
