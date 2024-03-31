@@ -81,5 +81,20 @@ export async function sendPayout(
 }
 
 export async function getPayoutDetails(payout_batch_id: string) {
-    return "";
+    return fetch(
+        `https://api-m.sandbox.paypal.com/v1/payments/payouts/${payout_batch_id}`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${await getAccessToken()}`,
+            },
+        }
+    )
+        .then((response) => {
+            return response.json();
+        })
+        .catch((error) => {
+            console.error("Error: " + error);
+        });
 }

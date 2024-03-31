@@ -80,7 +80,19 @@ function sendPayout(recipients, values, notes, currency_type, email_subject, ema
 exports.sendPayout = sendPayout;
 function getPayoutDetails(payout_batch_id) {
     return __awaiter(this, void 0, void 0, function* () {
-        return "";
+        return fetch(`https://api-m.sandbox.paypal.com/v1/payments/payouts/${payout_batch_id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${yield (0, auth_1.getAccessToken)()}`,
+            },
+        })
+            .then((response) => {
+            return response.json();
+        })
+            .catch((error) => {
+            console.error("Error: " + error);
+        });
     });
 }
 exports.getPayoutDetails = getPayoutDetails;

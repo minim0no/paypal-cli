@@ -9,9 +9,9 @@ const payout_option = new Option(
 const details = new Command("details")
     .description("show details for an entry")
     .addOption(payout_option)
-    .action((options) => {
+    .action(async (options) => {
         if (options.payout) {
-            const details = getPayoutDetails(options.payout);
+            const details = await getPayoutDetails(options.payout);
         }
     });
 
