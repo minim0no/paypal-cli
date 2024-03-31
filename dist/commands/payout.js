@@ -67,7 +67,8 @@ const payout = new commander_1.Command("payout")
     // email validation
     for (const recipient of recipient_list) {
         if (!validateEmail(recipient)) {
-            console.error(`Error: The email ${recipient} is not valid!`);
+            console.error(`Error: The email "${recipient}" is not valid.`);
+            console.error("Make sure you don't have spaces in your comma separated list!");
             process.exit(1);
         }
     }
@@ -83,7 +84,7 @@ const payout = new commander_1.Command("payout")
         output: process.stdout,
     });
     // confirmation
-    rl.question(`Are you sure you want to send a total of ${valuesSum(values)} ${options.currency} to ${recipient_list.length} receivers? (y/n)\n`, (confirmation) => {
+    rl.question(`Are you sure you want to send a total of ${valuesSum(value_list)} ${options.currency} to ${recipient_list.length} receivers? (y/n)\n`, (confirmation) => {
         switch (confirmation.toLowerCase()) {
             case "yes":
             case "y":
