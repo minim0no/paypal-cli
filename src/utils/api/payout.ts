@@ -79,3 +79,7 @@ export async function sendPayout(
 
     return sender_batch_id;
 }
+
+export async function getPayoutDetails(payout_batch_id: string) {
+    return "";
+}

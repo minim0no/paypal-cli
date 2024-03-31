@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendPayout = void 0;
+exports.getPayoutDetails = exports.sendPayout = void 0;
 const fs_1 = require("fs");
 const auth_1 = require("../auth");
 const path_1 = __importDefault(require("path"));
@@ -78,4 +78,10 @@ function sendPayout(recipients, values, notes, currency_type, email_subject, ema
     });
 }
 exports.sendPayout = sendPayout;
+function getPayoutDetails(payout_batch_id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return "";
+    });
+}
+exports.getPayoutDetails = getPayoutDetails;
 //# sourceMappingURL=payout.js.map

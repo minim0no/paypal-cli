@@ -11,6 +11,7 @@ const helpCommand = require("./commands/help");
 const loginCommand = require("./commands/login");
 const payoutCommand = require("./commands/payout");
 const historyCommand = require("./commands/history");
+const detailsCommand = require("./commands/details");
 program
     .name("ppl")
     .version("0.0.1")
@@ -20,5 +21,6 @@ program.addCommand(helpCommand);
 program.addCommand(loginCommand);
 program.addCommand(payoutCommand);
 program.addCommand(historyCommand);
+program.addCommand(detailsCommand);
 program.parse(process.argv);
 //# sourceMappingURL=ppl.js.map
