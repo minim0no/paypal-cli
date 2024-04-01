@@ -14,16 +14,16 @@ const auth_1 = require("./auth");
 const fs_1 = require("fs");
 /**
  * Refreshes the access token.
- * @returns null if credentials not found, "success" otherwise.
+ * @returns null if credentials not found, expiration otherwise.
  */
-function refreshToken() {
+function refreshToken(fromChild) {
     return __awaiter(this, void 0, void 0, function* () {
         const clientId = yield (0, auth_1.getClientId)();
         const clientSecret = yield (0, auth_1.getClientSecret)();
         if (clientId && clientSecret) {
-            const access_token = yield (0, auth_1.auth)(clientId, clientSecret);
-            (0, auth_1.setAccessToken)(access_token);
-            return "success";
+            const result = yield (0, auth_1.auth)(clientId, clientSecret, fromChild);
+            (0, auth_1.setAccessToken)(result.access_token);
+            return result.expires_in;
         }
         else {
             console.error("Error: credentials not found or unavailable");
@@ -40,7 +40,9 @@ function refreshTokenAfterDelay(delay) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log(delay);
         setTimeout(() => __awaiter(this, void 0, void 0, function* () {
-            yield refreshToken();
+            console.log("10 sec passed");
+            const expiration = yield refreshToken(true);
+            refreshTokenAfterDelay(expiration);
         }), delay * 1000); // s to ms
     });
 }

@@ -40,9 +40,6 @@ export function createRefreshTokenProcess(delay: number) {
 
         const pidFilePath = path.join(__dirname, "cur-pid.txt");
         writeFile(pidFilePath, child.pid ? child.pid.toString() : "");
-        child.on("exit", () => {
-            refreshToken();
-        });
 
         child.unref();
     });

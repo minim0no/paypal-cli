@@ -3,15 +3,15 @@ import { readFileSync } from "fs";
 
 /**
  * Refreshes the access token.
- * @returns null if credentials not found, "success" otherwise.
+ * @returns null if credentials not found, expiration otherwise.
  */
-export async function refreshToken() {
+export async function refreshToken(fromChild: boolean) {
     const clientId = await getClientId();
     const clientSecret = await getClientSecret();
     if (clientId && clientSecret) {
-        const access_token = await auth(clientId, clientSecret);
-        setAccessToken(access_token);
-        return "success";
+        const result = await auth(clientId, clientSecret, fromChild);
+        setAccessToken(result.access_token);
+        return result.expires_in;
     } else {
         console.error("Error: credentials not found or unavailable");
         return null;
@@ -25,7 +25,9 @@ export async function refreshToken() {
 export async function refreshTokenAfterDelay(delay: number) {
     console.log(delay);
     setTimeout(async () => {
-        await refreshToken();
+        console.log("10 sec passed");
+        const expiration = await refreshToken(true);
+        refreshTokenAfterDelay(expiration);
     }, delay * 1000); // s to ms
 }
 

@@ -8,7 +8,6 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = require("fs");
 const promises_1 = require("fs/promises");
 const child_process_1 = require("child_process");
-const refreshToken_1 = require("./refreshToken");
 /**
  * Checks if a child process is currently running.
  *
@@ -47,9 +46,6 @@ function createRefreshTokenProcess(delay) {
         });
         const pidFilePath = path_1.default.join(__dirname, "cur-pid.txt");
         (0, promises_1.writeFile)(pidFilePath, child.pid ? child.pid.toString() : "");
-        child.on("exit", () => {
-            (0, refreshToken_1.refreshToken)();
-        });
         child.unref();
     });
 }

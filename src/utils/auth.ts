@@ -1,6 +1,10 @@
 import { setPassword, getPassword } from "keytar";
 import { existsSync, readFileSync } from "fs";
-import { createRefreshTokenProcess, isRunning } from "./childProcess";
+import {
+    createRefreshTokenProcess,
+    isRunning,
+    killProcess,
+} from "./childProcess";
 import path from "path";
 
 /**
@@ -9,7 +13,11 @@ import path from "path";
  * @param clientSecret - The Client Secret for the PayPal App
  * @returns The access token retrieved
  */
-export async function auth(clientId: string, clientSecret: string) {
+export async function auth(
+    clientId: string,
+    clientSecret: string,
+    fromChild: boolean
+) {
     const authorization =
         "Basic " +
         Buffer.from(clientId + ":" + clientSecret).toString("base64"); // PayPal API wants Base64
@@ -30,22 +38,23 @@ export async function auth(clientId: string, clientSecret: string) {
 
     const data = await (response as Response).json();
     if (data.error) {
-        console.error("Error: ", data.error_description);
+        console.error(data.error_description);
     }
 
-    if (data && data.expires_in) {
-        const pidFilePath = path.join(__dirname, "cur-pid.txt");
-        if (existsSync(pidFilePath)) {
-            const cur_pid = Number(readFileSync(pidFilePath, "utf-8"));
-            if (!isRunning(cur_pid)) {
-                createRefreshTokenProcess(data.expires_in);
+    if (!fromChild) {
+        if (data && data.expires_in) {
+            const pidFilePath = path.join(__dirname, "cur-pid.txt");
+            if (existsSync(pidFilePath)) {
+                const cur_pid = Number(readFileSync(pidFilePath, "utf-8"));
+                if (isRunning(cur_pid)) {
+                    killProcess(cur_pid);
+                }
             }
-        } else {
             createRefreshTokenProcess(data.expires_in);
         }
     }
 
-    return data.access_token;
+    return { access_token: data.access_token, expires_in: data.expires_in };
 }
 
 /**

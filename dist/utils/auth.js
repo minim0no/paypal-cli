@@ -23,7 +23,7 @@ const path_1 = __importDefault(require("path"));
  * @param clientSecret - The Client Secret for the PayPal App
  * @returns The access token retrieved
  */
-function auth(clientId, clientSecret) {
+function auth(clientId, clientSecret, fromChild) {
     return __awaiter(this, void 0, void 0, function* () {
         const authorization = "Basic " +
             Buffer.from(clientId + ":" + clientSecret).toString("base64"); // PayPal API wants Base64
@@ -39,21 +39,21 @@ function auth(clientId, clientSecret) {
         }).catch((error) => console.error("Error:", error));
         const data = yield response.json();
         if (data.error) {
-            console.error("Error: ", data.error_description);
+            console.error(data.error_description);
         }
-        if (data && data.expires_in) {
-            const pidFilePath = path_1.default.join(__dirname, "cur-pid.txt");
-            if ((0, fs_1.existsSync)(pidFilePath)) {
-                const cur_pid = Number((0, fs_1.readFileSync)(pidFilePath, "utf-8"));
-                if (!(0, childProcess_1.isRunning)(cur_pid)) {
-                    (0, childProcess_1.createRefreshTokenProcess)(data.expires_in);
+        if (!fromChild) {
+            if (data && data.expires_in) {
+                const pidFilePath = path_1.default.join(__dirname, "cur-pid.txt");
+                if ((0, fs_1.existsSync)(pidFilePath)) {
+                    const cur_pid = Number((0, fs_1.readFileSync)(pidFilePath, "utf-8"));
+                    if ((0, childProcess_1.isRunning)(cur_pid)) {
+                        (0, childProcess_1.killProcess)(cur_pid);
+                    }
                 }
-            }
-            else {
                 (0, childProcess_1.createRefreshTokenProcess)(data.expires_in);
             }
         }
-        return data.access_token;
+        return { access_token: data.access_token, expires_in: data.expires_in };
     });
 }
 exports.auth = auth;
