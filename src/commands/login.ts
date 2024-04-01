@@ -2,20 +2,19 @@ import { Argument, Command } from "commander";
 import { setClientId, setClientSecret } from "../utils/auth";
 import { refreshToken } from "../utils/refreshToken";
 
-const clientId_arg = new Argument("[string]", "Client ID");
+const clientId_arg = new Argument("[clientId]", "Client ID");
 
-const clientSecret_arg = new Argument("[string]", "Client Secret");
+const clientSecret_arg = new Argument("[clientSecret]", "Client Secret");
 
 const login = new Command("login")
-    .description(
-        "Login to PayPal to begin using the PayPal CLI, do ppl login --help for more info."
-    )
+    .description("Login to PayPal to begin using the PayPal CLI")
     .addArgument(clientId_arg)
     .addArgument(clientSecret_arg)
     .action(async (clientId, clientSecret) => {
         if (clientId && clientSecret) {
             await setClientId(clientId);
             await setClientSecret(clientSecret);
+            console.log("credentials saved");
         }
 
         const opt = refreshToken(false);
@@ -23,6 +22,14 @@ const login = new Command("login")
             console.log("Error: Missing Client ID or Client Secret argument.");
         } else {
             console.log("Successfully logged in.");
+        }
+
+        if (clientId) {
+            console.log("If you are logged out of this app, do:\n");
+            console.log("\tppl login\n");
+            console.log(
+                "If you want to update the app you are using, please pass the credentials."
+            );
         }
     });
 

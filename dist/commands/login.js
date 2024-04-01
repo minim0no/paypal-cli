@@ -12,16 +12,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const auth_1 = require("../utils/auth");
 const refreshToken_1 = require("../utils/refreshToken");
-const clientId_arg = new commander_1.Argument("[string]", "Client ID");
-const clientSecret_arg = new commander_1.Argument("[string]", "Client Secret");
+const clientId_arg = new commander_1.Argument("[clientId]", "Client ID");
+const clientSecret_arg = new commander_1.Argument("[clientSecret]", "Client Secret");
 const login = new commander_1.Command("login")
-    .description("Login to PayPal to begin using the PayPal CLI, do ppl login --help for more info.")
+    .description("Login to PayPal to begin using the PayPal CLI")
     .addArgument(clientId_arg)
     .addArgument(clientSecret_arg)
     .action((clientId, clientSecret) => __awaiter(void 0, void 0, void 0, function* () {
     if (clientId && clientSecret) {
         yield (0, auth_1.setClientId)(clientId);
         yield (0, auth_1.setClientSecret)(clientSecret);
+        console.log("credentials saved");
     }
     const opt = (0, refreshToken_1.refreshToken)(false);
     if (!opt) {
@@ -29,6 +30,11 @@ const login = new commander_1.Command("login")
     }
     else {
         console.log("Successfully logged in.");
+    }
+    if (clientId) {
+        console.log("If you are logged out of this app, do:\n");
+        console.log("\tppl login\n");
+        console.log("If you want to update the app you are using, please pass the credentials.");
     }
 }));
 // --help
