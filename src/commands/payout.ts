@@ -10,6 +10,7 @@ const validateEmail = (email: string) => {
         );
 };
 
+// all the currencies paypal supports
 const paypalCurrencies = [
     "AUD", // Australian dollar
     "BRL", // Brazilian real (only for Brazil)

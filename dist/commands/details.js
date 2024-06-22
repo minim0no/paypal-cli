@@ -8,16 +8,70 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const payout_1 = require("../utils/api/payout");
+const readline_1 = require("readline");
+const chalk_1 = __importDefault(require("chalk"));
 const payout_option = new commander_1.Option("--payout <batchId>", "show details for a given payment ID");
 const details = new commander_1.Command("details")
-    .description("show details for an entry")
+    .description("Show details for an entry")
     .addOption(payout_option)
     .action((options) => __awaiter(void 0, void 0, void 0, function* () {
     if (options.payout) {
         const details = yield (0, payout_1.getPayoutDetails)(options.payout);
+        if (details.error == "invalid_token") {
+            throw new Error("Invalid token, make sure you're logged in! ppl login --help for more info.");
+        }
+        console.log(details);
+        const yellow = chalk_1.default.yellow;
+        const red = chalk_1.default.red;
+        const timeCreated = new Date(details.batch_header.time_created);
+        const timeCompleted = new Date(details.batch_header.time_completed);
+        let formattedTimeCreated = `${yellow(timeCreated.toLocaleDateString())} at ${red(timeCreated.toLocaleTimeString())}`;
+        let formattedTimeCompleted = `${yellow(timeCompleted.toLocaleDateString())} at ${red(timeCompleted.toLocaleTimeString())}`;
+        console.log(`The PayPal payout batch "${options.payout}" was created at`, `${formattedTimeCreated} and completed at`, `${formattedTimeCompleted}\n`);
+        const amount = details.batch_header.amount.value;
+        const fees = details.batch_header.fees.value;
+        const currency = details.batch_header.amount.currency;
+        const darkBlue = chalk_1.default.hex("#012169");
+        const green = chalk_1.default.green;
+        console.log(`The total amount paid, including fees, is: \n`, `${darkBlue(Number(amount) + Number(fees))} ${green(currency)}\n`);
+        const numItems = details.batch_header.items.length;
+        const rl = (0, readline_1.createInterface)({
+            input: process.stdin,
+            output: process.stdout,
+        });
+        rl.question(`Would you like to view all ${red(numItems)} items?(y/n)\n`, (confirmation) => {
+            switch (confirmation.toLowerCase()) {
+                case "yes":
+                case "y":
+                    for (let i = 0; i < numItems; i++) { }
+                    break;
+                case "no":
+                case "n":
+                    const customNumItems = Number(rl.question("How many items would you like to view?", (confirmation) => {
+                        return confirmation;
+                    }));
+                    if (customNumItems > numItems) {
+                        console.log(`You cannot select more than ${numItems} items!`);
+                    }
+                    else if (!customNumItems) {
+                        break;
+                    }
+                    else {
+                        for (let i = 0; i < customNumItems; i++) { }
+                    }
+                    break;
+                default:
+                    console.log("Invalid input.");
+                    break;
+            }
+            rl.close();
+        });
     }
 }));
 module.exports = details;

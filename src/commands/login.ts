@@ -1,28 +1,34 @@
 import { Argument, Command } from "commander";
-import { setClientId, setClientSecret } from "../utils/auth";
-import { refreshToken } from "../utils/refreshToken";
+import { setClientId, setClientSecret, auth } from "../utils/auth";
 
-const clientId_arg = new Argument("[string]", "Client ID");
+const clientId_arg = new Argument("[clientId]", "Client ID");
 
-const clientSecret_arg = new Argument("[string]", "Client Secret");
+const clientSecret_arg = new Argument("[clientSecret]", "Client Secret");
 
 const login = new Command("login")
-    .description(
-        "Login to PayPal to begin using the PayPal CLI, do ppl login --help for more info."
-    )
+    .description("Login to PayPal to begin using the PayPal CLI")
     .addArgument(clientId_arg)
     .addArgument(clientSecret_arg)
     .action(async (clientId, clientSecret) => {
         if (clientId && clientSecret) {
+            console.log("Saving credentials...");
             await setClientId(clientId);
             await setClientSecret(clientSecret);
         }
 
-        const opt = refreshToken(false);
-        if (!opt) {
-            console.log("Error: Missing Client ID or Client Secret argument.");
+        console.log("Logging in...");
+        if (!clientId || !clientSecret) {
+            console.log(
+                "Error: Missing Client ID and/or Client Secret argument."
+            );
         } else {
+            await auth(clientId, clientSecret);
             console.log("Successfully logged in.");
+            console.log("If you are logged out of this app, do:\n");
+            console.log("\tppl login\n");
+            console.log(
+                "If you want to update the app you are using, please pass in new credentials."
+            );
         }
     });
 
@@ -40,7 +46,7 @@ login.addHelpText(
 );
 
 login.showHelpAfterError(
-    "Make sure you are passing credentials if you're accessing a new REST API app, do ppl login --help for more info."
+    "Make sure you are passing credentials if you're accessing a new app, do ppl login --help for more info."
 );
 
 module.exports = login;
