@@ -14,10 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const payout_1 = require("../utils/api/payout");
+const readline_1 = require("readline");
 const chalk_1 = __importDefault(require("chalk"));
 const payout_option = new commander_1.Option("--payout <batchId>", "show details for a given payment ID");
 const details = new commander_1.Command("details")
-    .description("show details for an entry")
+    .description("Show details for an entry")
     .addOption(payout_option)
     .action((options) => __awaiter(void 0, void 0, void 0, function* () {
     if (options.payout) {
@@ -38,7 +39,39 @@ const details = new commander_1.Command("details")
         const currency = details.batch_header.amount.currency;
         const darkBlue = chalk_1.default.hex("#012169");
         const green = chalk_1.default.green;
-        console.log(`The total amount paid, including fees, is: \n`, `${darkBlue(Number(amount) + Number(fees))} ${green(currency)}`);
+        console.log(`The total amount paid, including fees, is: \n`, `${darkBlue(Number(amount) + Number(fees))} ${green(currency)}\n`);
+        const numItems = details.batch_header.items.length;
+        const rl = (0, readline_1.createInterface)({
+            input: process.stdin,
+            output: process.stdout,
+        });
+        rl.question(`Would you like to view all ${red(numItems)} items?(y/n)\n`, (confirmation) => {
+            switch (confirmation.toLowerCase()) {
+                case "yes":
+                case "y":
+                    for (let i = 0; i < numItems; i++) { }
+                    break;
+                case "no":
+                case "n":
+                    const customNumItems = Number(rl.question("How many items would you like to view?", (confirmation) => {
+                        return confirmation;
+                    }));
+                    if (customNumItems > numItems) {
+                        console.log(`You cannot select more than ${numItems} items!`);
+                    }
+                    else if (!customNumItems) {
+                        break;
+                    }
+                    else {
+                        for (let i = 0; i < customNumItems; i++) { }
+                    }
+                    break;
+                default:
+                    console.log("Invalid input.");
+                    break;
+            }
+            rl.close();
+        });
     }
 }));
 module.exports = details;

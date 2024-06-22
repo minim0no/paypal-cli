@@ -9,7 +9,7 @@ const payout_option = new Option(
 );
 
 const details = new Command("details")
-    .description("show details for an entry")
+    .description("Show details for an entry")
     .addOption(payout_option)
     .action(async (options) => {
         if (options.payout) {

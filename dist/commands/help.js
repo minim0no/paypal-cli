@@ -11,7 +11,7 @@ const help = new commander_1.Command("help").action(() => {
     const lightBlue = chalk_1.default.hex("#009cde");
     console.log("\n");
     console.log((0, paypal_ascii_1.default)());
-    console.log("\nusage: ppl [-V | --version] [-h | --help] <command>\n");
+    console.log("\nusage: ppl [-V | --version] <command> [-h | --help] \n");
     console.log("\nThese are common Ppl commands used to interact with PayPal: ");
     console.log("\n");
     console.log(darkBlue("To get started login:"));

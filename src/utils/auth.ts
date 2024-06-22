@@ -1,23 +1,11 @@
 import { setPassword, getPassword } from "keytar";
-import { existsSync, readFileSync } from "fs";
-import {
-    createRefreshTokenProcess,
-    isRunning,
-    killProcess,
-} from "./childProcess";
-import path from "path";
 
 /**
  *
  * @param clientId - The Client ID for the PayPal App
  * @param clientSecret - The Client Secret for the PayPal App
- * @returns The access token retrieved
  */
-export async function auth(
-    clientId: string,
-    clientSecret: string,
-    fromChild: boolean
-) {
+export async function auth(clientId: string, clientSecret: string) {
     const authorization =
         "Basic " +
         Buffer.from(clientId + ":" + clientSecret).toString("base64"); // PayPal API wants Base64
@@ -41,20 +29,21 @@ export async function auth(
         console.error(data.error_description);
     }
 
-    if (!fromChild) {
-        if (data && data.expires_in) {
-            const pidFilePath = path.join(__dirname, "cur-pid.txt");
-            if (existsSync(pidFilePath)) {
-                const cur_pid = Number(readFileSync(pidFilePath, "utf-8"));
-                if (isRunning(cur_pid)) {
-                    killProcess(cur_pid);
-                }
-            }
-            createRefreshTokenProcess(data.expires_in);
-        }
-    }
+    await setAccessToken(data.access_token);
+    await setExpirationTime(data.expires_in);
+}
 
-    return { access_token: data.access_token, expires_in: data.expires_in };
+/**
+ * Checks if the Access Token is expired
+ * @returns True if the Access Token is expired, False otherwise
+ */
+export async function isExpired() {
+    const expirationTime = await getExpirationTime();
+    if (expirationTime) {
+        return Date.now() > expirationTime;
+    } else {
+        return true;
+    }
 }
 
 /**
@@ -141,5 +130,52 @@ export async function getAccessToken() {
         }
     } catch (error) {
         console.error("Error fetching Access Token: ", error);
+    }
+}
+
+/**
+ * Sets the expiration time for the Access Token in the user's Credential Manager
+ * @returns The expiration time for the Access Token
+ */
+export async function setExpirationTime(expires_in: number) {
+    try {
+        const expirationTime = Date.now() + expires_in * 1000;
+        await setPassword(
+            "PayPal",
+            "ExpirationTime",
+            expirationTime.toString()
+        );
+    } catch (error) {
+        console.error("Error saving expiration time: ", error);
+    }
+}
+
+/**
+ * Retrieves the expiration time for the Access Token from the user's Credential Manager
+ * @returns The expiration time for the Access Token
+ */
+export async function getExpirationTime() {
+    try {
+        const expirationTime = await getPassword("PayPal", "ExpirationTime");
+        if (expirationTime) {
+            return parseInt(expirationTime);
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error("Error fetching expiration time: ", error);
+    }
+}
+
+/**
+ * Checks if the user is authenticated, if not, it will authenticate the user
+ */
+export async function checkAuth() {
+    if (await isExpired()) {
+        const clientId = await getClientId();
+        const clientSecret = await getClientSecret();
+        if (clientId && clientSecret) {
+            auth(clientId, clientSecret);
+        }
     }
 }

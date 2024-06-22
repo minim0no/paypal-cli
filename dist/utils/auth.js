@@ -8,22 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAccessToken = exports.getClientSecret = exports.getClientId = exports.setAccessToken = exports.setClientSecret = exports.setClientId = exports.auth = void 0;
+exports.getExpirationTime = exports.setExpirationTime = exports.getAccessToken = exports.getClientSecret = exports.getClientId = exports.setAccessToken = exports.setClientSecret = exports.setClientId = exports.isExpired = exports.auth = void 0;
 const keytar_1 = require("keytar");
-const fs_1 = require("fs");
-const childProcess_1 = require("./childProcess");
-const path_1 = __importDefault(require("path"));
 /**
  *
  * @param clientId - The Client ID for the PayPal App
  * @param clientSecret - The Client Secret for the PayPal App
- * @returns The access token retrieved
  */
-function auth(clientId, clientSecret, fromChild) {
+function auth(clientId, clientSecret) {
     return __awaiter(this, void 0, void 0, function* () {
         const authorization = "Basic " +
             Buffer.from(clientId + ":" + clientSecret).toString("base64"); // PayPal API wants Base64
@@ -41,22 +34,27 @@ function auth(clientId, clientSecret, fromChild) {
         if (data.error) {
             console.error(data.error_description);
         }
-        if (!fromChild) {
-            if (data && data.expires_in) {
-                const pidFilePath = path_1.default.join(__dirname, "cur-pid.txt");
-                if ((0, fs_1.existsSync)(pidFilePath)) {
-                    const cur_pid = Number((0, fs_1.readFileSync)(pidFilePath, "utf-8"));
-                    if ((0, childProcess_1.isRunning)(cur_pid)) {
-                        (0, childProcess_1.killProcess)(cur_pid);
-                    }
-                }
-                (0, childProcess_1.createRefreshTokenProcess)(data.expires_in);
-            }
-        }
-        return { access_token: data.access_token, expires_in: data.expires_in };
+        yield setAccessToken(data.access_token);
+        yield setExpirationTime(data.expires_in);
     });
 }
 exports.auth = auth;
+/**
+ * Checks if the Access Token is expired
+ * @returns True if the Access Token is expired, False otherwise
+ */
+function isExpired() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const expirationTime = yield getExpirationTime();
+        if (expirationTime) {
+            return Date.now() > expirationTime;
+        }
+        else {
+            return true;
+        }
+    });
+}
+exports.isExpired = isExpired;
 /**
  * Sets the Client ID in the user's Credential Manager
  * @param clientId - The Client ID for the PayPal App
@@ -165,4 +163,41 @@ function getAccessToken() {
     });
 }
 exports.getAccessToken = getAccessToken;
+/**
+ * Sets the expiration time for the Access Token in the user's Credential Manager
+ * @returns The expiration time for the Access Token
+ */
+function setExpirationTime(expires_in) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const expirationTime = Date.now() + expires_in * 1000;
+            yield (0, keytar_1.setPassword)("PayPal", "ExpirationTime", expirationTime.toString());
+        }
+        catch (error) {
+            console.error("Error saving expiration time: ", error);
+        }
+    });
+}
+exports.setExpirationTime = setExpirationTime;
+/**
+ * Retrieves the expiration time for the Access Token from the user's Credential Manager
+ * @returns The expiration time for the Access Token
+ */
+function getExpirationTime() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const expirationTime = yield (0, keytar_1.getPassword)("PayPal", "ExpirationTime");
+            if (expirationTime) {
+                return parseInt(expirationTime);
+            }
+            else {
+                return null;
+            }
+        }
+        catch (error) {
+            console.error("Error fetching expiration time: ", error);
+        }
+    });
+}
+exports.getExpirationTime = getExpirationTime;
 //# sourceMappingURL=auth.js.map

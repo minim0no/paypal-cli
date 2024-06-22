@@ -7,7 +7,7 @@ const help = new Command("help").action(() => {
     const lightBlue = chalk.hex("#009cde");
     console.log("\n");
     console.log(ASCII());
-    console.log("\nusage: ppl [-V | --version] [-h | --help] <command>\n");
+    console.log("\nusage: ppl [-V | --version] <command> [-h | --help] \n");
 
     console.log(
         "\nThese are common Ppl commands used to interact with PayPal: "
